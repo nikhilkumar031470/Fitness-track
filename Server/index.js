@@ -7,6 +7,7 @@ const Workout = require("./model/Workout");
 const Progress = require("./model/Progress");
 const goals = require("./model/goals");
 const Reminder = require("./model/Reminder");
+const bcrypt = require("bcrypt");
 const multer = require("multer");
 const Users = require("./model/Users");
 const app = express();
@@ -196,9 +197,38 @@ app.post("/api/register", upload.single("profilePic"), async (req, res) => {
     // Store only filename if an image is uploaded
     const profilePic = req.file ? req.file.filename : null;
 
-    await Users.insertOne({ fullName, email, password, cPassword, profilePic });
+    const hashPassword = await bcrypt.hash(password, 10);
+    // const hashcPassword = await bcrypt.hash(cPassword, 10);
+
+    await Users.insertOne({ fullName, email, password: hashPassword, cPassword, profilePic });
 
     res.status(200).send({ message: "User added successfully" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Error adding user" });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const registeredUser = await Users.findOne({email: email});
+    
+    if(registeredUser){
+        const isMatch = await bcrypt.compare(password, registeredUser.password);
+        if(isMatch){
+            res.status(200).send({message: "Logged in Successfully", registeredUser});
+            console.log("Login Successfully");
+        }
+        else {
+            res.status(200).send({message: "Invalid Credentials"});
+            console.log("Invalid Credentials");
+        }
+    }
+    else {
+        res.status(200).send({message: "User don't exist"});
+    }
   } catch (err) {
     console.log(err);
     res.status(500).send({ message: "Error adding user" });

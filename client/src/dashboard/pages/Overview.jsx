@@ -49,7 +49,7 @@ export default function Overview() {
                </div>
             </div>
             
-            <h1 className="text-7xl md:text-9xl font-black leading-[0.85] tracking-tighter italic uppercase">
+            <h1 className="text-7xl md:text-7xl font-black leading-[0.85] tracking-tighter italic uppercase">
               Command <br/>
               <span className="text-sky-500 not-italic">The Day,</span> <br/>
               Sameer.
