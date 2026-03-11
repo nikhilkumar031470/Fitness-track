@@ -7,12 +7,29 @@ const Workout = require("./model/Workout");
 const Progress = require("./model/Progress");
 const goals = require("./model/goals");
 const Reminder = require("./model/Reminder");
+const multer = require("multer");
+const Users = require("./model/Users");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
 connectDB();
+
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+})
+
+const upload = multer({ storage: storage })
+
+
 
 app.post("/api/add-nutrition", async (req, res) => {
     try {
@@ -149,7 +166,7 @@ app.get("/api/fetch-goals", async(req, res) => {
 app.get("/api/fetch-reminder", async(req, res) => {
     try{
         const reminderdata = await Reminder.find();
-        res.status(200).send({message: "Goals Fetched Successfully", reminderdata});
+        res.status(200).send({message: "reminder Fetched Successfully", reminderdata});
     }
     catch (error) {
         res.json({
@@ -159,19 +176,33 @@ app.get("/api/fetch-reminder", async(req, res) => {
     }
 })
 
-app.post("/api/register", async (req, res) => {
-    try {
-
-        const { fullName, email,password, cPassword } = req.body;
-
-        await User.insertOne({  });
-
-        res.status(200).send({ message: "User added successfully" });
-
-    } catch (err) {
-        res.status(200).send({ message: "Error adding data" });
-        console.log(err);
+app.get("/api/fetch-userdata", async(req, res) => {
+    try{
+        const userdata = await Users.find();
+        res.status(200).send({message: "User Data Fetched Successfully", userdata});
     }
+    catch (error) {
+        res.json({
+            message:error.message,
+            error
+        })
+    }
+})
+
+app.post("/api/register", upload.single("profilePic"), async (req, res) => {
+  try {
+    const { fullName, email, password, cPassword } = req.body;
+
+    // Store only filename if an image is uploaded
+    const profilePic = req.file ? req.file.filename : null;
+
+    await Users.insertOne({ fullName, email, password, cPassword, profilePic });
+
+    res.status(200).send({ message: "User added successfully" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Error adding user" });
+  }
 });
 
 app.listen(3000, () => {

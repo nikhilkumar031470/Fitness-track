@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import axios from "axios"; // Added axios
 
-const Reminders = () => {
+const AddReminders = () => {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("Reminder");
   const [date, setDate] = useState("");
@@ -173,4 +173,4 @@ const Reminders = () => {
   );
 };
 
-export default Reminders;
+export default AddReminders;

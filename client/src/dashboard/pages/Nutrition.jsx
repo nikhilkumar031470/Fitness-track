@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import axios from "axios"
-import { Apple, Coffee, Utensils, Plus, Droplets, Zap, Waves, PieChart } from 'lucide-react'
+import { Apple, Coffee, Utensils, Plus, Droplets, Zap, Waves, PieChart, Search, ArrowBigDownDash } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
 export default function Nutrition() {
 
   const [nutritionData, setNutritionData] = useState([])
   const [waterAmount, setWaterAmount] = useState(2.4)
+  const [searchMeal, setSearchMeal] = useState("")
   const waterGoal = 3.0
 
   // FETCH NUTRITION
   const fetchNutrition = async () => {
     try {
       const response = await axios.get("http://localhost:3000/api/fetch-nutrition")
-      console.log("API Response:", response.data.nutritiondata)
       setNutritionData(response.data.nutritiondata || [])
     }
     catch (err) {
@@ -23,9 +25,38 @@ export default function Nutrition() {
     }
   }
 
+  let filteredMeals = nutritionData;
+
+  if (searchMeal !== "") {
+    filteredMeals = nutritionData.filter((meal) =>
+      meal.mealType.toLowerCase().includes(searchMeal.toLowerCase())
+    );
+  }
+
   useEffect(() => {
     fetchNutrition()
   }, [])
+
+  // TOTAL CALCULATIONS
+  const totalCalories = nutritionData.reduce(
+    (sum, item) => sum + (Number(item.calories) || 0),
+    0
+  )
+
+  const totalProtein = nutritionData.reduce(
+    (sum, item) => sum + (Number(item.proteins) || 0),
+    0
+  )
+
+  const totalCarbs = nutritionData.reduce(
+    (sum, item) => sum + (Number(item.carbs) || 0),
+    0
+  )
+
+  const totalFat = nutritionData.reduce(
+    (sum, item) => sum + (Number(item.fats) || 0),
+    0
+  )
 
   const addWater = () => {
     if (waterAmount < waterGoal) {
@@ -45,6 +76,119 @@ export default function Nutrition() {
     if (type === "Lunch") return { color: "text-indigo-400", bg: "bg-indigo-400/10" }
     if (type === "Snack") return { color: "text-emerald-400", bg: "bg-emerald-400/10" }
     return { color: "text-sky-400", bg: "bg-sky-400/10" }
+  }
+
+  // ==========================
+  // DOWNLOAD LOGIC
+  // ==========================
+
+  const handleDownload = () => {
+
+    const format = prompt("Enter format: PDF or CSV")
+
+    if (!format) return
+
+    if (format.toLowerCase() === "csv") {
+      downloadCSV()
+    }
+
+    if (format.toLowerCase() === "pdf") {
+      downloadPDF()
+    }
+
+  }
+
+  // CSV DOWNLOAD
+  const downloadCSV = () => {
+
+    const headers = [
+      "Meal Type",
+      "Food Name",
+      "Protein (g)",
+      "Carbs (g)",
+      "Fats (g)",
+      "Calories"
+    ]
+
+    const rows = nutritionData.map(item => [
+      item.mealType,
+      item.foodName,
+      item.proteins,
+      item.carbs,
+      item.fats,
+      item.calories
+    ])
+
+    rows.push([])
+    rows.push(["TOTAL", "", totalProtein, totalCarbs, totalFat, totalCalories])
+
+    const csvContent =
+      [headers, ...rows]
+        .map(e => e.join(","))
+        .join("\n")
+
+    const blob = new Blob([csvContent], { type: "text/csv" })
+
+    const url = window.URL.createObjectURL(blob)
+
+    const link = document.createElement("a")
+
+    link.href = url
+    link.download = "Nutrition.csv"
+
+    link.click()
+  }
+
+  // PDF DOWNLOAD
+  const downloadPDF = () => {
+
+    const doc = new jsPDF()
+
+    const tableColumn = [
+      "Meal Type",
+      "Food Name",
+      "Protein (g)",
+      "Carbs (g)",
+      "Fats (g)",
+      "Calories"
+    ]
+
+    const tableRows = []
+
+    nutritionData.forEach(item => {
+
+      const row = [
+        item.mealType,
+        item.foodName,
+        item.proteins,
+        item.carbs,
+        item.fats,
+        item.calories
+      ]
+
+      tableRows.push(row)
+
+    })
+
+    tableRows.push([
+      "TOTAL",
+      "",
+      totalProtein,
+      totalCarbs,
+      totalFat,
+      totalCalories
+    ])
+
+    doc.text("Nutrition Report", 14, 15)
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20
+    })
+
+    doc.save("Nutrition.pdf")
+
   }
 
   return (
@@ -73,17 +217,30 @@ export default function Nutrition() {
           </p>
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="group flex items-center justify-center gap-3 bg-white text-slate-950 px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl"
-        >
-          <Plus size={18} strokeWidth={4} />
-          <Link to="/dashboard/add-nutrition">Register Intake</Link>
-        </motion.button>
+        <div className="flex items-center gap-4">
 
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="group flex items-center justify-center gap-3 bg-white text-slate-950 px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl"
+          >
+            <Plus size={18} strokeWidth={4} />
+            <Link to="/dashboard/add-nutrition">Add Nutrition</Link>
+          </motion.button>
+
+          <motion.button
+            onClick={handleDownload}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="group flex items-center justify-center bg-white text-slate-950 px-10 py-3.5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl"
+          >
+            <ArrowBigDownDash />
+          </motion.button>
+
+        </div>
       </header>
 
+      
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
 
         {/* Left Column: Progress & Hydration */}
@@ -112,8 +269,8 @@ export default function Nutrition() {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <h3 className="text-4xl font-black text-white italic">
-                    1,080
-                  </h3>
+  {totalCalories}
+</h3>
                   <span className="text-[9px] font-black text-slate-500 uppercase">
                     kcal remaining
                   </span>
@@ -173,23 +330,65 @@ export default function Nutrition() {
 
           {/* Macros */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <MacroCard label="Protein" current={112} goal={150} unit="g" color="from-sky-400 to-sky-600" icon={<Zap size={14} />} />
-            <MacroCard label="Carbs" current={145} goal={220} unit="g" color="from-indigo-400 to-indigo-600" icon={<PieChart size={14} />} />
-            <MacroCard label="Fats" current={42} goal={70} unit="g" color="from-slate-400 to-slate-600" icon={<Droplets size={14} />} />
+           <MacroCard
+  label="Protein"
+  current={totalProtein}
+  goal={150}
+  unit="g"
+  color="from-sky-400 to-sky-600"
+  icon={<Zap size={14} />}
+/>
+
+<MacroCard
+  label="Carbs"
+  current={totalCarbs}
+  goal={220}
+  unit="g"
+  color="from-indigo-400 to-indigo-600"
+  icon={<PieChart size={14} />}
+/>
+
+<MacroCard
+  label="Fats"
+  current={totalFat}
+  goal={70}
+  unit="g"
+  color="from-slate-400 to-slate-600"
+  icon={<Droplets size={14} />}
+/>
           </div>
+{/* Fuel Chronology */}
+<div className="bg-slate-900/50 backdrop-blur-xl rounded-[3rem] border border-slate-800 p-10 shadow-2xl">
 
-          {/* Fuel Chronology */}
-          <div className="bg-slate-900/50 backdrop-blur-xl rounded-[3rem] border border-slate-800 p-10 shadow-2xl">
+  {/* Title + Search Row */}
+  <div className="flex items-center justify-between mb-8">
 
-            <h3 className="text-2xl font-black text-white italic uppercase mb-8">
-              Fuel Chronology
-            </h3>
+    <h3 className="text-2xl font-black text-white italic uppercase">
+      Fuel Chronology
+    </h3>
 
+    {/* Search */}
+    <div className="relative hidden md:block group">
+      <Search
+        className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-sky-400 transition-colors"
+        size={18}
+      />
+
+      <input
+  type="text"
+  placeholder="Search analytics, workouts, or meals..."
+  value={searchMeal}
+  onChange={(e) => setSearchMeal(e.target.value)}
+  className="w-80 lg:w-70 rounded-2xl bg-white/5 border border-transparent focus:border-sky-500/30 focus:bg-white/10 px-11 py-2.5 text-xs text-white placeholder:text-slate-600 outline-none transition-all duration-300"
+/>
+    </div>
+
+  </div>
             <div className="space-y-4">
 
               <AnimatePresence>
 
-                {(nutritionData || []).map((meal, i) => {
+                {(filteredMeals || []).map((meal, i) => {
                   const style = getColor(meal.mealType)
                   return (
                     <motion.div

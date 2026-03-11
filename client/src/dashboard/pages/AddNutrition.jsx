@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { PlusCircle, Utensils, Calendar, Flame, Dna, Wheat, Droplet, ChevronRight } from "lucide-react";
 import axios from "axios";
+import { gooeyToast } from "goey-toast";
 
 const AddNutrition = () => {
   const [mealType, setMealType] = useState("Breakfast");
@@ -25,6 +26,15 @@ const AddNutrition = () => {
         carbs,
         fats
       })
+
+gooeyToast.warning(response.data.message, {
+  fillColor: '#4f2385',
+  borderColor: '#514d4d',
+  borderWidth: 1.5,
+  timing: {
+    displayDuration: 5500,
+  },
+})
       console.log(response.data.message);
 
       setMealType("");
