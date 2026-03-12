@@ -119,7 +119,7 @@ const SidebarLink = ({ item, isMobile = false }) => {
   );
 };
 
-export default function Sidebar() {
+export default function Sidebar({logoutUser}) {
   return (
     <>
       {/* Desktop Sidebar */}
@@ -141,7 +141,7 @@ export default function Sidebar() {
                   size={22}
                   className="group-hover:-translate-x-1 transition-transform"
                 />
-                <span className="hidden lg:block uppercase text-[11px] tracking-widest">
+                <span onClick={logoutUser} className="hidden lg:block uppercase text-[11px] tracking-widest">
                   Logout
                 </span>
               </button>

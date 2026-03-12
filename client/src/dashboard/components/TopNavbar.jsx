@@ -47,15 +47,15 @@ const CommandSearch = () => {
 /**
  * User Profile Sub-component
  */
-const UserMenu = ({ onLogout }) => (
+const UserMenu = ({ onLogout, loggedUser }) => (
   <button
     onClick={onLogout}
     className="flex items-center gap-3 group p-1.5 pr-3 rounded-2xl hover:bg-white/5 transition-all duration-300 focus:outline-none"
   >
     <div className="relative">
       <img
-        src="https://i.pravatar.cc/150?u=shah"
-        alt="Sameer Khan"
+        src={`http://localhost:3000/uploads/${loggedUser.profilePic}`}
+        alt={loggedUser.fullName}
         className="h-10 w-10 rounded-xl object-cover ring-2 ring-transparent group-hover:ring-sky-500/50 transition-all"
         onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Sameer+Khan&background=0ea5e9&color=fff"; }}
       />
@@ -64,7 +64,7 @@ const UserMenu = ({ onLogout }) => (
 
     <div className="hidden sm:block text-left">
       <p className="text-[12px] font-black text-white group-hover:text-sky-400 transition-colors tracking-tight">
-        Sameer Khan
+        {loggedUser.fullName}
       </p>
       <p className="text-[9px] font-black uppercase text-slate-500 group-hover:text-rose-500 transition-colors tracking-widest">
         Sign Out
@@ -73,7 +73,7 @@ const UserMenu = ({ onLogout }) => (
   </button>
 );
 
-const TopNavbar = ({ setIsAuthenticated }) => {
+const TopNavbar = ({ setIsAuthenticated, loggedUser }) => {
   const handleLogout = () => {
     // Human touch: Wrap logout in a function for future logic (like clearing tokens)
     setIsAuthenticated(false);
@@ -87,7 +87,7 @@ const TopNavbar = ({ setIsAuthenticated }) => {
 
         <div className="flex items-center gap-3 md:gap-6">
           <ThemeToggle />
-          <UserMenu onLogout={handleLogout} />
+          <UserMenu onLogout={handleLogout} loggedUser={loggedUser} />
         </div>
 
       </div>

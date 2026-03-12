@@ -4,11 +4,11 @@ import TopNavbar from './components/TopNavbar'
 import { Outlet } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
-const DashboardLayout = () => {
+const DashboardLayout = ({logoutUser, loggedUser}) => {
   return (
     <div className="flex h-screen bg-slate-950 text-slate-200 font-sans selection:bg-sky-500/30 overflow-hidden">
       {/* 1. Tactical Sidebar */}
-      <Sidebar />
+      <Sidebar logoutUser = {logoutUser} />
 
       {/* 2. Main Command Interface */}
       <div className="flex-1 flex flex-col relative overflow-hidden">
@@ -17,7 +17,7 @@ const DashboardLayout = () => {
         <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-sky-500/5 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-[-10%] left-[-5%] w-[30%] h-[30%] bg-indigo-500/5 blur-[100px] rounded-full pointer-events-none" />
 
-        <TopNavbar />
+        <TopNavbar loggedUser={loggedUser} />
 
         {/* 3. Content Arena */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">

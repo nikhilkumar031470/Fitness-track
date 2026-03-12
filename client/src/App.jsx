@@ -1,5 +1,5 @@
-import React from 'react'
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import React, { useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Home from './pages/Home'
 
 import Cards from './features/Cards'
@@ -27,13 +27,26 @@ import ReminderCard from './dashboard/pages/Reminders'
 
 
 const App = () => {
+
+  const [loggedUser, setLoggedUser] = useState(JSON.parse(localStorage.getItem("user")) || "");
+
+  const loginUser = (data) => {
+    setLoggedUser(data);
+    localStorage.setItem("user", JSON.stringify(data));
+  }
+
+  const logoutUser = () => {
+    setLoggedUser("");
+    localStorage.removeItem("user");
+  }
+
   return (
     <>
 
       <BrowserRouter>
         <Routes>
 
-          <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route path="/dashboard" element={ loggedUser ? <DashboardLayout logoutUser={logoutUser} loggedUser={loggedUser} /> : <Navigate to="/login"/>}>
             <Route path='overview' element={<Overview />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="community" element={<Community />} />
@@ -58,7 +71,7 @@ const App = () => {
           </Route>
 
           <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login loginUser={loginUser} />} />
 
         </Routes>
       </BrowserRouter>

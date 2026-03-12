@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Mail,
   Lock,
@@ -13,11 +13,12 @@ import {
 import { motion } from "framer-motion";
 import axios from 'axios'
 
-const Login = () => {
+const Login = ({loginUser}) => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +27,11 @@ const Login = () => {
       email,
       password
       });
-      console.log(response);
+      console.log(response.data.registeredUser);
+      loginUser(response.data.registeredUser);
+      navigate("/dashboard");
+
+
   };
 
   return (
