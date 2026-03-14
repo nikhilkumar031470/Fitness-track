@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Home from './pages/Home'
-
 import Cards from './features/Cards'
 import Feedback from './features/Feedback'
 import About from './features/About'
@@ -23,6 +22,9 @@ import AddWorkout from './dashboard/pages/AddWorkout'
 import Goals from './dashboard/pages/Goals'
 import Progress from './dashboard/pages/Progress'
 import ReminderCard from './dashboard/pages/Reminders'
+import { GooeyToaster } from 'goey-toast'
+import NutritionAnalysis from './dashboard/pages/NutritionAnalysis'
+import UserProfile from './dashboard/pages/UserProfile'
 
 
 
@@ -42,25 +44,26 @@ const App = () => {
 
   return (
     <>
-
       <BrowserRouter>
         <Routes>
 
           <Route path="/dashboard" element={ loggedUser ? <DashboardLayout logoutUser={logoutUser} loggedUser={loggedUser} /> : <Navigate to="/login"/>}>
-            <Route path='overview' element={<Overview />} />
+            <Route path='overview' element={<Overview  loggedUser={loggedUser}/>} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="community" element={<Community />} />
             <Route path="minicalender" element={<MiniCalendar />} />
             <Route path="nutrition" element={<Nutrition />} />
-            <Route path="add-nutrition" element={<AddNutrition />} />
-            <Route path="add-workout" element={<AddWorkout />} />
+            <Route path="add-nutrition" element={<AddNutrition loggedUser={loggedUser} />} />
+            <Route path="add-workout" element={<AddWorkout loggedUser={loggedUser}/>} />
             <Route path="progress" element={<Progress />} />
             <Route path="goals" element={<Goals />} />
             <Route path="reminder" element={<ReminderCard />} />
-            <Route path="add-progress" element={<AddProgress />} />
-            <Route path="add-goals" element={<AddGoals />} />
-            <Route path="add-reminders" element={<AddReminders />} />
+            <Route path="add-progress" element={<AddProgress loggedUser={loggedUser}/>} />
+            <Route path="add-goals" element={<AddGoals loggedUser={loggedUser}/>} />
+            <Route path="add-reminders" element={<AddReminders loggedUser={loggedUser}/>} />
             <Route path="workouts" element={<Workouts />} />
+            <Route path='nutrition-analysis'element={<NutritionAnalysis />}/>
+            <Route path="userprofile" element={<UserProfile />} />
           </Route>
 
           <Route path="/" element={<AppLayout />}>

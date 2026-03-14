@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { PlusCircle, Utensils, Calendar, Flame, Dna, Wheat, Droplet, ChevronRight } from "lucide-react";
 import axios from "axios";
 import { gooeyToast } from "goey-toast";
+import { Navigate } from "react-router-dom";
 
-const AddNutrition = () => {
+const AddNutrition = ({loggedUser}) => {
   const [mealType, setMealType] = useState("Breakfast");
   const [entryDate, setEntryDate] = useState(""); // for the date
   const [foodName, setFoodName] = useState("");
@@ -12,6 +13,8 @@ const AddNutrition = () => {
   const [proteins, setProteins] = useState("");
   const [carbs, setCarbs] = useState("");
   const [fats, setFats] = useState("");
+
+  const userID = loggedUser._id;
 
   const handleSubmit = async (e) => {
     try {
@@ -24,17 +27,17 @@ const AddNutrition = () => {
         calories,
         proteins,
         carbs,
-        fats
+        fats,
+        userID,
       })
 
-gooeyToast.warning(response.data.message, {
-  fillColor: '#4f2385',
-  borderColor: '#514d4d',
-  borderWidth: 1.5,
-  timing: {
-    displayDuration: 5500,
-  },
-})
+   console.log(response.data.message);
+gooeyToast("Nutrition added Successfully", {
+fillColor: '05070a',
+  borderColor: '#cfcfcf',
+  borderWidth: 1,
+
+});
       console.log(response.data.message);
 
       setMealType("");
@@ -45,7 +48,12 @@ gooeyToast.warning(response.data.message, {
       setCarbs("");
       setFats("");
       setEntryDate("");
+      setTimeout(() => {
+        Navigate("/dashboard/nutrition");
+      }, 1500);
     }
+
+    
     catch (err) {
       console.log(err)
     }

@@ -13,7 +13,8 @@ import {
   Sparkles,
   Target,
   Bell,
-  TrendingUp
+  TrendingUp,
+  UserCircle
 } from "lucide-react";
 
 // Navigation Links
@@ -21,12 +22,14 @@ const NAVIGATION_LINKS = [
   { icon: LayoutDashboard, label: "Overview", path: "/dashboard/overview" },
   { icon: Dumbbell, label: "Workouts", path: "/dashboard/workouts" },
   { icon: Apple, label: "Nutrition", path: "/dashboard/nutrition" },
+  { icon: TrendingUp, label: "Nutrition Analysis", path: "/dashboard/nutrition-analysis" },
   { icon: TrendingUp, label: "Progress", path: "/dashboard/progress" }, // Progress Tab
   { icon: Target, label: "Goals", path: "/dashboard/goals" }, // Goals Tab
   { icon: Bell, label: "Reminders", path: "/dashboard/reminder" }, // Reminder Tab
   { icon: BarChart3, label: "Analytics", path: "/dashboard/analytics" },
   { icon: Users, label: "Community", path: "/dashboard/community" },
-  { icon: Settings, label: "Settings", path: "/dashboard/settings" },
+  
+  { icon: UserCircle, label: "Profile", path: "/dashboard/userprofile" },
 ];
 
 /**

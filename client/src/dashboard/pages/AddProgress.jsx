@@ -10,8 +10,10 @@ import {
   ClipboardCheck
 } from "lucide-react";
 import axios from "axios";
+import { Navigate } from "react-router-dom";
+import { gooeyToast } from "goey-toast";
 
-const AddProgress = () => {
+const AddProgress = ({loggedUser}) => {
 
   const dateInputRef = useRef(null);
 
@@ -21,12 +23,14 @@ const AddProgress = () => {
   const [waist, setWaist] = useState("");
   const [runtime, setRuntime] = useState("");
   const [liftweight, setLiftweight] = useState("");
+  const userID = loggedUser._id;
 
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
 
       const response = await axios.post("http://localhost:3000/api/add-progress", {
+        userID,
         date: entryDate,
         weight,
         chest,
@@ -34,8 +38,13 @@ const AddProgress = () => {
         runtime,
         liftweight,
       });
+  console.log(response.data.message);
+gooeyToast("Progress added Successfully", {
+fillColor: '05070a',
+  borderColor: '#cfcfcf',
+  borderWidth: 1,
 
-      console.log(response.data.message);
+});
 
       setentryDate("");
       setWeight("");
@@ -43,6 +52,10 @@ const AddProgress = () => {
       setWaist("");
       setRuntime("");
       setLiftweight("");
+
+      setTimeout(() => {
+        Navigate("/dashboard/analytics");
+      }, 1500);
 
     } catch (err) {
       console.log(err);

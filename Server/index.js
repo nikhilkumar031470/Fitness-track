@@ -35,9 +35,9 @@ const upload = multer({ storage: storage })
 app.post("/api/add-nutrition", async (req, res) => {
     try {
 
-        const { mealType, date, foodName, quantity, calories, proteins, carbs, fats } = req.body;
+        const { mealType, date, foodName, quantity, calories, proteins, carbs, fats, userID } = req.body;
 
-        await Nutrition.insertOne({ mealType, date, foodName, quantity, calories, proteins, carbs, fats });
+        await Nutrition.insertOne({ mealType, date, foodName, quantity, calories, proteins, carbs, fats, userID });
 
         res.status(200).send({ message: "Data added successfully" });
 
@@ -50,9 +50,9 @@ app.post("/api/add-nutrition", async (req, res) => {
 app.post("/api/add-workout", async (req, res) => {
     try {
 
-        const { Category, date: entryDate,ExerciseName,Tages, Sets, Reps, Weight, Note } = req.body;
+        const { Category, date: entryDate,ExerciseName,Tages, Sets, Reps, Weight, Note,userID } = req.body;
 
-        await Workout.insertOne({ Category, date: entryDate,ExerciseName,Tages, Sets, Reps, Weight, Note });
+        await Workout.insertOne({ Category, date: entryDate,ExerciseName,Tages, Sets, Reps, Weight, Note,userID });
 
         res.status(200).send({ message: "Data added successfully" });
 
@@ -69,10 +69,10 @@ app.post("/api/add-workout", async (req, res) => {
 app.post("/api/add-progress", async (req, res) => {
     try {
 
-        const { date: entryDate, weight, chest, waist, runtime, liftweight } = req.body;
+        const { date: entryDate, weight, chest, waist, runtime, liftweight,userID } = req.body;
 
 
-        await Progress.insertOne({ date: entryDate, weight, chest, waist, runtime, liftweight });
+        await Progress.insertOne({ date: entryDate, weight, chest, waist, runtime, liftweight,userID });
 
         res.status(200).send({ message: "Data added successfully" });
 
@@ -88,10 +88,10 @@ app.post("/api/add-progress", async (req, res) => {
 app.post("/api/add-goals", async (req, res) => {
     try {
 
-        const { goalType, deadline, targetweight, currentweight, notes } = req.body;
+        const { goalType, deadline, targetweight, currentweight, notes, userID } = req.body;
 
 
-        await goals.insertOne({ goalType, deadline, targetweight, currentweight, notes });
+        await goals.insertOne({ goalType, deadline, targetweight, currentweight, notes, userID });
 
         res.status(200).send({ message: "Data added successfully" });
 
@@ -107,10 +107,10 @@ app.post("/api/add-goals", async (req, res) => {
 app.post("/api/add-reminder", async (req, res) => {
     try {
 
-        const { title, type, date, time, category, notes } = req.body;
+        const { title, type, date, time, category, notes,userID } = req.body;
 
 
-        await Reminder.insertOne({ title, type, date, time, category, notes });
+        await Reminder.insertOne({ title, type, date, time, category, notes,userID });
 
         res.status(200).send({ message: "Data added successfully" });
 
@@ -177,6 +177,21 @@ app.get("/api/fetch-reminder", async(req, res) => {
     }
 })
 
+
+
+
+app.get("/api/fetch-progress", async(req, res) => {
+    try{
+        const progress = await Progress.find();
+        res.status(200).send({message: "reminder Fetched Successfully", progress});
+    }
+    catch (error) {
+        res.json({
+            message:error.message,
+            error
+        })
+    }
+})
 app.get("/api/fetch-userdata", async(req, res) => {
     try{
         const userdata = await Users.find();
@@ -234,7 +249,22 @@ app.post("/api/login", async (req, res) => {
     res.status(500).send({ message: "Error adding user" });
   }
 });
+app.post("/api/update-profile", async (req,res)=>{
 
+  const { userID, fullName, profilePic } = req.body
+
+  const user = await User.findByIdAndUpdate(
+    userID,
+    { fullName, profilePic },
+    { new:true }
+  )
+
+  res.json({
+    message:"Profile updated",
+    user
+  })
+
+})
 app.listen(3000, () => {
     console.log("Server Started");
 })

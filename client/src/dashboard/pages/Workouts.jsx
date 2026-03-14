@@ -11,25 +11,54 @@ export default function Workouts() {
   // ⭐ search state
   const [searchWorkout, setSearchWorkout] = useState("");
 
+  // ⭐ logged user (safe read)
+  const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+
+  // ==============================
+  // FETCH WORKOUTS
+  // ==============================
   const fetchWorkouts = async () => {
+
     try {
+
       const response = await axios.get("http://localhost:3000/api/fetch-workouts");
-      console.log(response.data.workoutdata);
-      setWorkoutsData(response.data.workoutdata);
+
+      const allWorkouts = response.data.workoutdata || [];
+
+      // ⭐ show only logged user's workouts
+      const userWorkouts = allWorkouts.filter(
+        (item) => String(item.userID) === String(loggedUser?._id)
+      );
+
+      console.log(userWorkouts);
+
+      setWorkoutsData(userWorkouts);
+
     }
+
     catch (err) {
       console.log("Error Fetching Users", err);
     }
+
   };
 
+
+  // ==============================
+  // FETCH NUTRITION CALORIES
+  // ==============================
   const fetchNutritionCalories = async () => {
+
     try {
 
       const res = await axios.get("http://localhost:3000/api/fetch-nutrition");
 
       const data = res.data.nutritiondata || [];
+      const userMeals = data.filter(
+        (item) => String(item.userID) === String(loggedUser?._id)
+      );
 
-      const total = data.reduce(
+      const total = userMeals.reduce(
         (sum, item) => sum + (Number(item.calories) || 0),
         0
       );
@@ -39,12 +68,17 @@ export default function Workouts() {
     } catch (err) {
       console.log("Error fetching nutrition calories", err);
     }
+
   };
 
+
   useEffect(() => {
+
     fetchWorkouts();
     fetchNutritionCalories();
+
   }, []);
+
 
   // convert calories → 2.4k format
   const caloriesK = (totalCalories / 1000).toFixed(1) + "k";
@@ -54,9 +88,11 @@ export default function Workouts() {
   let filteredWorkouts = workoutsData;
 
   if (searchWorkout !== "") {
+
     filteredWorkouts = workoutsData.filter((item) =>
       item.ExerciseName.toLowerCase().includes(searchWorkout.toLowerCase())
     );
+
   }
 
 
@@ -68,13 +104,13 @@ export default function Workouts() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 
           {[
-            { label: "Workouts", val: workoutsData.length, icon: <Trophy className="text-yellow-500" />, bg: "bg-[#161b22]" },
+            { label: "Workouts", val: workoutsData.length, icon: <Trophy className="text-yellow-500" />, bg: "bg-yellow-500/10" },
 
-            { label: "Calories", val: caloriesK, icon: <Flame className="text-orange-500" />, bg: "bg-[#161b22]" },
+            { label: "Calories", val: caloriesK, icon: <Flame className="text-orange-500" />, bg: "bg-orange-500/10" },
 
-            { label: "Avg Time", val: "28m", icon: <Clock className="text-blue-500" />, bg: "bg-[#161b22]" },
+            { label: "Avg Time", val: "28m", icon: <Clock className="text-blue-500" />, bg: "bg-sky-500/10" },
 
-            { label: "Streak", val: "12d", icon: <Zap className="text-purple-500" />, bg: "bg-[#161b22]" },
+            { label: "Streak", val: "12d", icon: <Zap className="text-purple-500" />, bg: "bg-purple-500/10" },
 
           ].map((s, i) => (
             <div key={i} className={`${s.bg} p-4 rounded-3xl flex items-center gap-4 shadow-sm`}>

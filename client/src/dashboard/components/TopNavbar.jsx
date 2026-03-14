@@ -57,7 +57,7 @@ const UserMenu = ({ onLogout, loggedUser }) => (
         src={`http://localhost:3000/uploads/${loggedUser.profilePic}`}
         alt={loggedUser.fullName}
         className="h-10 w-10 rounded-xl object-cover ring-2 ring-transparent group-hover:ring-sky-500/50 transition-all"
-        onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Sameer+Khan&background=0ea5e9&color=fff"; }}
+        onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${loggedUser.fullName}&background=0ea5e9&color=fff`; }}
       />
       <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-emerald-500 border-2 border-[#020617] rounded-full" />
     </div>
@@ -66,9 +66,7 @@ const UserMenu = ({ onLogout, loggedUser }) => (
       <p className="text-[12px] font-black text-white group-hover:text-sky-400 transition-colors tracking-tight">
         {loggedUser.fullName}
       </p>
-      <p className="text-[9px] font-black uppercase text-slate-500 group-hover:text-rose-500 transition-colors tracking-widest">
-        Sign Out
-      </p>
+    
     </div>
   </button>
 );

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Play, Flame, Footprints, Clock, ArrowRight, Zap, Target, Activity, Trophy, ShieldAlert, Sparkles } from 'lucide-react';
 import { motion } from "framer-motion";
+import { Link, Links } from 'react-router-dom';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -19,7 +20,7 @@ const itemVariants = {
   }
 };
 
-export default function Overview() {
+export default function Overview({loggedUser}) {
   const today = new Date().toLocaleDateString('en-US', { 
     weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' 
   });
@@ -52,7 +53,7 @@ export default function Overview() {
             <h1 className="text-7xl md:text-7xl font-black leading-[0.85] tracking-tighter italic uppercase">
               Command <br/>
               <span className="text-sky-500 not-italic">The Day,</span> <br/>
-              Sameer.
+              {loggedUser.fullName}.
             </h1>
             
             <div className="flex items-start gap-5 max-w-lg">
@@ -65,10 +66,11 @@ export default function Overview() {
             
             <div className="flex flex-wrap gap-6 pt-4">
               <button className="group flex items-center gap-6 rounded-[2rem] bg-sky-500 px-12 py-7 text-sm font-black text-slate-950 shadow-2xl shadow-sky-500/30 transition-all hover:bg-sky-400 active:scale-95 uppercase tracking-[0.2em]">
-                Initialize HIIT <Play size={20} fill="currentColor" className="group-hover:scale-125 transition-transform" />
+               <Link to={"/dashboard/workouts"}>Initialize Workout</Link> <Play size={20} fill="currentColor" className="group-hover:scale-125 transition-transform" />
               </button>
               <button className="rounded-[2rem] bg-slate-800/40 px-12 py-7 text-sm font-black text-white border border-white/5 backdrop-blur-xl hover:bg-slate-800 transition-all uppercase tracking-[0.2em]">
-                View Protocol
+                
+                <Link to={"/dashboard/nutrition"}>View Nutrition</Link>
               </button>
             </div>
           </motion.div>
@@ -186,16 +188,14 @@ export default function Overview() {
             
             <div className="pt-6 flex flex-wrap items-center justify-center xl:justify-start gap-12">
               <button className="flex items-center gap-4 bg-white text-slate-950 px-12 py-6 rounded-[2rem] font-black text-xs uppercase tracking-[0.25em] shadow-2xl transition-all hover:bg-sky-400 hover:text-slate-950 active:scale-95">
-                Execute Plan <ArrowRight size={20} strokeWidth={4} />
+              <Link to={"/dashboard/workouts"}>Workout's</Link>   <ArrowRight size={20} strokeWidth={4} />
               </button>
               <div className="flex items-center gap-5">
                 <div className="flex -space-x-4">
-                    {[1,2,3,4].map(i => (
-                    <img key={i} className="w-12 h-12 rounded-full border-4 border-slate-950 shadow-xl" src={`https://i.pravatar.cc/150?u=${i+10}`} alt="user" />
-                    ))}
+                    
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-black text-white uppercase italic tracking-tighter">+14,204 Active</span>
+                  <span className="text-[11px] font-black text-white uppercase italic tracking-tighter"> Active</span>
                   <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Training Now</span>
                 </div>
               </div>

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { gooeyToast, GooeyToaster } from "goey-toast";
 import { 
   Target, 
   Calendar, 
@@ -10,48 +11,63 @@ import {
   Activity
 } from "lucide-react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-const AddGoals = () => {
+const AddGoals = ({ loggedUser }) => {
 
+  const navigate = useNavigate();
   const dateInputRef = useRef(null);
 
   const [goalType, setGoalType] = useState("Weight Loss");
-  const [deadline, setDeadline] = useState("2026-05-30");
+  const [deadline, setDeadline] = useState("");
   const [targetweight, setTargetweight] = useState("");
   const [currentweight, setCurrentweight] = useState("");
   const [notes, setNotes] = useState("");
+
+  const userID = loggedUser._id;
 
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
 
       const response = await axios.post("http://localhost:3000/api/add-goals", {
+        userID,
         goalType,
         deadline,
         targetweight,
         currentweight,
         notes
       });
-
       console.log(response.data.message);
+gooeyToast("Goal added Successfully", {
+fillColor: '05070a',
+  borderColor: '#cfcfcf',
+  borderWidth: 1,
 
-      setGoalType("");
+});
+      setGoalType("Weight Loss");
       setDeadline("");
       setTargetweight("");
       setCurrentweight("");
       setNotes("");
 
+      setTimeout(() => {
+        navigate("/dashboard/goals");
+      }, 1500);
+
     } catch (err) {
+      console.log(`Something went wrong!`);
       console.log(err);
     }
   };
+
   return (
+    <>
     <div className="min-h-screen bg-[#05070a] flex items-center justify-center p-6 text-white font-sans">
 
       <div className="w-full max-w-5xl bg-[#0b0f14] rounded-2xl border border-gray-800/50 shadow-2xl p-12">
         
-        {/* Header Section */}
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           
           <div className="flex items-center gap-5">
@@ -95,13 +111,13 @@ const AddGoals = () => {
                 <select
                   value={goalType}
                   onChange={(e) => setGoalType(e.target.value)}
-                  className="w-full bg-[#161b22] border border-gray-800 p-5 rounded-xl text-base focus:outline-none focus:border-[#00a3ff] transition-all appearance-none cursor-pointer"
+                  className="w-full bg-[#161b22] border border-gray-800 p-5 rounded-xl text-base focus:outline-none focus:border-[#00a3ff]"
                 >
-                  <option className="bg-[#0b0f14]">Weight Loss</option>
-                  <option className="bg-[#0b0f14]">Weight Gain</option>
-                  <option className="bg-[#0b0f14]">Muscle Gain</option>
-                  <option className="bg-[#0b0f14]">Strength</option>
-                  <option className="bg-[#0b0f14]">Endurance</option>
+                  <option>Weight Loss</option>
+                  <option>Weight Gain</option>
+                  <option>Muscle Gain</option>
+                  <option>Strength</option>
+                  <option>Endurance</option>
                 </select>
 
                 <Flag className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400 pointer-events-none" />
@@ -124,7 +140,7 @@ const AddGoals = () => {
                   type="date"
                   value={deadline}
                   onChange={(e) => setDeadline(e.target.value)}
-                  className="w-full bg-[#161b22] border border-gray-800 p-5 rounded-xl text-base focus:outline-none focus:border-[#00a3ff] transition-all"
+                  className="w-full bg-[#161b22] border border-gray-800 p-5 rounded-xl text-base focus:outline-none focus:border-[#00a3ff]"
                 />
 
                 <Calendar
@@ -141,7 +157,7 @@ const AddGoals = () => {
           {/* Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
 
-            <div className="bg-[#161b22]/40 border border-gray-800/80 p-10 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:bg-[#1c232c]/50">
+            <div className="bg-[#161b22]/40 border border-gray-800/80 p-10 rounded-2xl flex flex-col items-center text-center">
               <TrendingUp className="w-8 h-8 text-emerald-400 mb-5" />
 
               <span className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-2">
@@ -152,7 +168,6 @@ const AddGoals = () => {
 
                 <input
                   type="number"
-                  placeholder="0"
                   value={currentweight}
                   onChange={(e) => setCurrentweight(e.target.value)}
                   className="bg-transparent text-4xl font-black text-white w-24 text-center focus:outline-none"
@@ -166,7 +181,7 @@ const AddGoals = () => {
 
             </div>
 
-            <div className="bg-[#161b22]/40 border border-gray-800/80 p-10 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:bg-[#1c232c]/50">
+            <div className="bg-[#161b22]/40 border border-gray-800/80 p-10 rounded-2xl flex flex-col items-center text-center">
               
               <Activity className="w-8 h-8 text-[#00a3ff] mb-5" />
 
@@ -178,7 +193,6 @@ const AddGoals = () => {
 
                 <input
                   type="number"
-                  placeholder="0"
                   value={targetweight}
                   onChange={(e) => setTargetweight(e.target.value)}
                   className="bg-transparent text-4xl font-black text-white w-24 text-center focus:outline-none"
@@ -202,10 +216,10 @@ const AddGoals = () => {
             </label>
 
             <textarea
-              placeholder="Ex. 500 calorie deficit with 3 days of heavy lifting..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full bg-[#161b22] border border-gray-800 p-5 rounded-xl text-base focus:outline-none focus:border-[#00a3ff] h-32 resize-none transition-all placeholder:text-gray-700"
+              placeholder="Ex. 500 calorie deficit with 3 days of heavy lifting..."
+              className="w-full bg-[#161b22] border border-gray-800 p-5 rounded-xl text-base focus:outline-none focus:border-[#00a3ff] h-32 resize-none"
             />
 
           </div>
@@ -216,13 +230,13 @@ const AddGoals = () => {
             className="w-full bg-[#1d4ed8] hover:bg-blue-600 text-white font-black uppercase italic tracking-[0.2em] py-6 rounded-xl flex items-center justify-center gap-4 transition-all shadow-[0_10px_30px_rgba(29,78,216,0.3)] active:scale-[0.98]"
           >
             <PlusCircle className="w-6 h-6" />
-            <Link to={"/dashboard/goals"}>Initialize Goal Protocol</Link>
+            Initialize Goal Protocol
           </button>
 
         </form>
 
         {/* Footer */}
-        <div className="mt-12 pt-6 border-t border-gray-900/50 flex justify-between items-center text-[9px] font-bold text-gray-600 uppercase tracking-[0.3em]">
+        <div className="mt-12 pt-6 border-t border-gray-900/50 flex justify-between text-[9px] font-bold text-gray-600 uppercase tracking-[0.3em]">
           <span>Track Status: Calibrating // V2.0</span>
           <span className="text-blue-900/40">Fitcore V3.0 // Neural Link Active</span>
         </div>
@@ -230,6 +244,7 @@ const AddGoals = () => {
       </div>
 
     </div>
+    </>
   );
 };
 

@@ -29,7 +29,7 @@ const Login = ({loginUser}) => {
       });
       console.log(response.data.registeredUser);
       loginUser(response.data.registeredUser);
-      navigate("/dashboard");
+      navigate("/dashboard/overview");
 
 
   };
@@ -180,12 +180,12 @@ const Login = ({loginUser}) => {
 
           <footer className="pt-6 border-t border-slate-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">
-              No Data Found?{" "}
+              Not have an account?{" "}
               <Link
                 to="/register"
                 className="text-sky-500 hover:text-sky-300 transition-colors ml-1"
               >
-                Establish Profile
+                Register
               </Link>
             </p>
 

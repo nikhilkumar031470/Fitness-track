@@ -70,16 +70,14 @@ const GoalCard = ({ goal }) => {
         {goal.title}
       </h3>
 
-{/* Notes */}
-        {goal.notes && (
-          <p className="text-xs text-gray-400 border-l-2 border-blue-500 pl-3 pb-2">
-            {goal.notes}
-          </p>
-        )}
-        
+      {goal.notes && (
+        <p className="text-xs text-gray-400 border-l-2 border-blue-500 pl-3 pb-2">
+          {goal.notes}
+        </p>
+      )}
+
       <div className="space-y-3 relative z-10 pt-1">
 
-        {/* Deadline + Progress */}
         <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-tighter">
 
           <div className="flex items-center gap-2 text-gray-500 bg-gray-50 dark:bg-white/5 px-2 py-0.5 rounded-md">
@@ -93,9 +91,6 @@ const GoalCard = ({ goal }) => {
 
         </div>
 
-        
-
-        {/* Progress Bar */}
         <div className="h-1.5 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
 
           <motion.div
@@ -107,7 +102,6 @@ const GoalCard = ({ goal }) => {
 
         </div>
 
-        {/* Current & Target Weight */}
         <div className="flex justify-between text-xs text-gray-400 mt-2">
           <span>Current: {goal.currentweight} kg</span>
           <span>Target: {goal.targetweight} kg</span>
@@ -136,13 +130,24 @@ export default function Goals() {
   const [goals, setGoals] = useState([]);
   const [filter, setFilter] = useState("all");
 
+  // ⭐ logged user (safe localStorage read)
+  const loggedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+
   const fetchGoals = async () => {
 
     try {
 
       const response = await axios.get("http://localhost:3000/api/fetch-goals");
 
-      const formattedGoals = response.data.goalsdata.map((g) => {
+      const allGoals = response.data.goalsdata || [];
+
+      // ⭐ show only logged user's goals
+      const userGoals = allGoals.filter(
+        (g) => String(g.userID) === String(loggedUser?._id)
+      );
+
+      const formattedGoals = userGoals.map((g) => {
 
         let progress = 0;
 

@@ -10,22 +10,32 @@ import {
   Tag
 } from "lucide-react";
 import axios from "axios"; // Added axios
+import { Navigate } from "react-router-dom";
+import { gooeyToast } from "goey-toast";
 
-const AddReminders = () => {
+const AddReminders = ({loggedUser}) => {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("Reminder");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [category, setCategory] = useState("Workout");
   const [notes, setNotes] = useState("");
+const userID = loggedUser._id;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const reminderData = { title, type, date, time, category, notes };
+    const reminderData = {userID, title, type, date, time, category, notes };
     
     try {
       const response = await axios.post("http://localhost:3000/api/add-reminder", reminderData);
+
       console.log("Server Response:", response.data.message);
+      gooeyToast("Progress added Successfully", {
+fillColor: '05070a',
+  borderColor: '#cfcfcf',
+  borderWidth: 1,
+
+});
 
       // Reset all form fields
       setTitle("");
@@ -34,6 +44,10 @@ const AddReminders = () => {
       setTime("");
       setCategory("Workout");
       setNotes("");
+      setTimeout(() => {
+              Navigate("/dashboard/reminder");
+            }, 1500);
+      
     } catch (err) {
       console.error("Error adding reminder:", err);
     }

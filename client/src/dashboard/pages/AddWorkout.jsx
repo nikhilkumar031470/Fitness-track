@@ -12,9 +12,10 @@ import {
   PlusCircle,
   Loader2
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { gooeyToast } from "goey-toast";
 
-const AddWorkout = () => {
+const AddWorkout = ({loggedUser}) => {
 
   const [Category, setCategory] = useState("Chest");
   const [entryDate, setEntryDate] = useState("");
@@ -25,6 +26,7 @@ const AddWorkout = () => {
   const [Weight, setWeight] = useState("");
   const [Note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
+  const userID = loggedUser._id;
 
   const handleSubmit = async (e) => {
     try {
@@ -32,6 +34,7 @@ const AddWorkout = () => {
       setLoading(true);
 
       const response = await axios.post("http://localhost:3000/api/add-workout", {
+        userID,
         Category,
         entryDate,
         ExerciseName,
@@ -44,6 +47,13 @@ const AddWorkout = () => {
 
       console.log(response.data.message);
 
+      gooeyToast("Progress added Successfully", {
+fillColor: '05070a',
+  borderColor: '#cfcfcf',
+  borderWidth: 1,
+
+});
+
       setCategory("Chest");
       setEntryDate("");
       setExerciseName("");
@@ -52,6 +62,9 @@ const AddWorkout = () => {
       setReps("");
       setWeight("");
       setNote("");
+      setTimeout(() => {
+              Navigate("/dashboard/workouts");
+            }, 1500);
 
       setLoading(false);
 
