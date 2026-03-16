@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { Search } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import { Navigate } from "react-router-dom";
